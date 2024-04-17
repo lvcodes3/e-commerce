@@ -9,11 +9,31 @@ CREATE DATABASE "nutritionTracker"
 
 
 CREATE TABLE inventory (
-    id SERIAL NOT NULL PRIMARY KEY,
-    name TEXT NOT NULL,
-    serial_number TEXT NOT NULL,
-    quantity INTEGER NOT NULL
-)
+    product_id SERIAL NOT NULL PRIMARY KEY,
+    product_name TEXT NOT NULL,
+    product_description TEXT NOT NULL,
+    product_category TEXT NOT NULL,
+    product_price NUMERIC NOT NULL,
+    product_quantity INTEGER NOT NULL,
+    product_image TEXT NOT NULL,
+    product_date_added TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    product_last_updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    product_status TEXT NOT NULL,
+    CHECK (product_status IN ('active', 'inactive', 'out of stock'))
+);
+
+CREATE TABLE orders (
+    order_id SERIAL NOT NULL PRIMARY KEY,
+    customer_full_name TEXT NOT NULL,
+    customer_email TEXT NOT NULL UNIQUE,
+    customer_address TEXT NOT NULL,
+    customer_city TEXT NOT NULL,
+    customer_state TEXT NOT NULL,
+    customer_zip TEXT NOT NULL,
+    order_total NUMERIC NOT NULL,
+    order_status TEXT NOT NULL,
+    order_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+);
 
 -- 2. Create consumer Table --
 CREATE TABLE consumer (
