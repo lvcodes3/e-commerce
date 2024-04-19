@@ -1,33 +1,27 @@
 // express web server //
-import express from "express";
+const express = require("express");
 const app = express();
 
 // env vars //
-import dotenv from "dotenv";
-dotenv.config();
+require("dotenv").config();
 const PORT = process.env.PORT;
 
 // middlewares //
 app.use(express.json());
 
-import cors from "cors";
+const cors = require("cors");
 app.use(
   cors({
     origin: "http://localhost:3000",
   })
 );
 
-import morgan from "morgan";
+const morgan = require("morgan");
 app.use(morgan("tiny"));
 
 // routes //
-/*
-const consumerRoutes = require("./routes/consumerRoutes.js");
-app.use("/api/v1/consumer", consumerRoutes);
-
-const nutritionRoutes = require("./routes/nutritionRoutes.js");
-app.use("/api/v1/nutrition", nutritionRoutes);
-*/
+const inventoryRoutes = require("./routes/inventoryRoutes.js");
+app.use("/api/v1/inventory", inventoryRoutes);
 
 // server //
 app.listen(PORT, () => {

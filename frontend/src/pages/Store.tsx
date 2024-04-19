@@ -1,48 +1,99 @@
 import { useState, useEffect } from "react";
+import axios from "axios";
+import { RotatingLines } from "react-loader-spinner";
 
-interface Product {
-  product_id: number;
-  product_name: string;
-  product_description: string;
-  product_category: string;
-  product_price: number;
-  product_quantity: number;
-  product_image: string;
-  product_date_added: string;
-  product_last_updated: string;
-  product_status: string;
+interface Item {
+  id: number;
+  name: string;
+  description: string;
+  category: string;
+  price: number;
+  quantity: number;
+  images: string[];
+  status: string;
 }
 
 const Store = () => {
-  const [product, setProduct] = useState<Product>({
-    product_id: 0,
-    product_name: "",
-    product_description: "",
-    product_category: "",
-    product_price: 0,
-    product_quantity: 0,
-    product_image: "",
-    product_date_added: "",
-    product_last_updated: "",
-    product_status: "",
-  });
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [item, setItem] = useState<Item | null>(null);
+  const [quantity, setQuantity] = useState<number>(1);
 
   useEffect(() => {
-    const getProduct = async () => {};
-    getProduct();
+    const getItem = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/api/v1/inventory/get"
+        );
+        if (response.status === 200) {
+          console.log(response.data);
+          setItem(response.data.rows[0]);
+        } else {
+          throw new Error("Failed to fetch item.");
+        }
+      } catch (err: any) {
+        console.log(`Error: ${err.message}`);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    getItem();
   }, []);
 
+  const addToCart = () => {
+
+  };
+
   return (
-    <div className="w-screen h-[calc(100vh-100px)] pt-5 flex justify-center bg-[#5281bf]">
+    <div className="w-screen min-h-[calc(100vh-100px)] h-full bg-slate-200">
       {isLoading ? (
-        <div>Loading...</div>
-      ) : (
-        <div className="border-2 border-black shadow-xl">
-          <h1>{product.product_name}</h1>
-          <img src={product.product_image} alt={product?.product_name} />
-          <p>Description: {product.product_description}</p>
+        <div className="w-full h-full flex justify-center">
+          <RotatingLines
+            visible={true}
+            width="50"
+            strokeColor="grey"
+            strokeWidth="5"
+            animationDuration="0.75"
+          />
         </div>
+      ) : (
+        item &&
+        item.quantity > 0 &&
+        item.status === "active" && (
+          <div className="w-full h-full py-5 flex flex-col items-center gap-y-8">
+            <h1 className="text-2xl font-bold">{item.name}</h1>
+            <div className="w-[200px] sm:w-[500px] md:w-screen flex flex-wrap justify-center gap-x-4 gap-y-2">
+              {item.images.map((image, index) => (
+                <div className="w-[200px] h-[200px] flex justify-center items-center">
+                    <img
+                      className="max-w-full max-h-full"
+                      key={index}
+                      src={image}
+                      alt={item.name}
+                    />
+                </div>
+              ))}
+            </div>
+            <p className="text-lg font-medium">{item.description}</p>
+            {item.quantity < 100 && (
+              <p className="text-lg font-medium">
+                Only {item.quantity} left in stock!
+              </p>
+            )}
+            <p className="text-lg font-medium">${item.price}</p>
+            <div className="flex justify-center items-center gap-x-2">
+              <select className="p-1" onChange={(e) => setQuantity(parseInt(e.target.value))}>
+                {[...Array(10)].map((_, index) => (
+                  <option key={index + 1}>{index + 1}</option>
+                ))}
+              </select>
+              <button 
+                className="p-2 font-medium cursor-pointer rounded-full border-2 border-black"
+                onClick={addToCart}>
+                Add to Cart
+              </button>
+            </div>
+          </div>
+        )
       )}
     </div>
   );
