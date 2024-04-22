@@ -13,10 +13,15 @@ interface Item {
   status: string;
 }
 
-const Store = () => {
+type StoreProps = {
+  cartQuantity: number | null;
+  setCartQuantity: React.Dispatch<React.SetStateAction<number | null>>;
+};
+
+const Store: React.FC<StoreProps> = ({ cartQuantity, setCartQuantity }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [item, setItem] = useState<Item | null>(null);
-  const [quantity, setQuantity] = useState<number>(1);
+  const [selectQuantity, setSelectQuantity] = useState<number>(1);
 
   useEffect(() => {
     const getItem = async () => {
@@ -40,7 +45,40 @@ const Store = () => {
   }, []);
 
   const addToCart = () => {
+    if (item) {
+      // existing cart //
+      if (
+        localStorage.getItem("product_name") &&
+        localStorage.getItem("product_quantity") &&
+        localStorage.getItem("product_price")
+      ) {
+        if (cartQuantity !== null) {
+          setCartQuantity(cartQuantity + selectQuantity);
+          localStorage.setItem(
+            "product_quantity",
+            (cartQuantity + selectQuantity).toString()
+          );
+        }
 
+        let prevPrice: string | null = localStorage.getItem("product_price");
+        if (prevPrice !== null) {
+          localStorage.setItem(
+            "product_price",
+            (parseFloat(prevPrice) + item.price * selectQuantity).toString()
+          );
+        }
+      }
+      // empty cart //
+      else {
+        setCartQuantity(selectQuantity);
+        localStorage.setItem("product_name", item.name);
+        localStorage.setItem("product_quantity", selectQuantity.toString());
+        localStorage.setItem(
+          "product_price",
+          (item.price * selectQuantity).toString()
+        );
+      }
+    }
   };
 
   return (
@@ -63,13 +101,15 @@ const Store = () => {
             <h1 className="text-2xl font-bold">{item.name}</h1>
             <div className="w-[200px] sm:w-[500px] md:w-screen flex flex-wrap justify-center gap-x-4 gap-y-2">
               {item.images.map((image, index) => (
-                <div className="w-[200px] h-[200px] flex justify-center items-center">
-                    <img
-                      className="max-w-full max-h-full"
-                      key={index}
-                      src={image}
-                      alt={item.name}
-                    />
+                <div
+                  className="w-[200px] h-[200px] flex justify-center items-center"
+                  key={index}
+                >
+                  <img
+                    className="max-w-full max-h-full"
+                    src={image}
+                    alt={item.name}
+                  />
                 </div>
               ))}
             </div>
@@ -81,14 +121,18 @@ const Store = () => {
             )}
             <p className="text-lg font-medium">${item.price}</p>
             <div className="flex justify-center items-center gap-x-2">
-              <select className="p-1" onChange={(e) => setQuantity(parseInt(e.target.value))}>
+              <select
+                className="p-1"
+                onChange={(e) => setSelectQuantity(parseInt(e.target.value))}
+              >
                 {[...Array(10)].map((_, index) => (
                   <option key={index + 1}>{index + 1}</option>
                 ))}
               </select>
-              <button 
+              <button
                 className="p-2 font-medium cursor-pointer rounded-full border-2 border-black"
-                onClick={addToCart}>
+                onClick={addToCart}
+              >
                 Add to Cart
               </button>
             </div>
