@@ -48,22 +48,22 @@ const Store: React.FC<StoreProps> = ({ cartQuantity, setCartQuantity }) => {
     if (item) {
       // existing cart //
       if (
-        localStorage.getItem("product_name") &&
-        localStorage.getItem("product_quantity") &&
-        localStorage.getItem("product_price")
+        localStorage.getItem("item_name") &&
+        localStorage.getItem("item_quantity") &&
+        localStorage.getItem("item_price")
       ) {
         if (cartQuantity !== null) {
           setCartQuantity(cartQuantity + selectQuantity);
           localStorage.setItem(
-            "product_quantity",
+            "item_quantity",
             (cartQuantity + selectQuantity).toString()
           );
         }
 
-        let prevPrice: string | null = localStorage.getItem("product_price");
+        let prevPrice: string | null = localStorage.getItem("item_price");
         if (prevPrice !== null) {
           localStorage.setItem(
-            "product_price",
+            "item_price",
             (parseFloat(prevPrice) + item.price * selectQuantity).toString()
           );
         }
@@ -71,10 +71,10 @@ const Store: React.FC<StoreProps> = ({ cartQuantity, setCartQuantity }) => {
       // empty cart //
       else {
         setCartQuantity(selectQuantity);
-        localStorage.setItem("product_name", item.name);
-        localStorage.setItem("product_quantity", selectQuantity.toString());
+        localStorage.setItem("item_name", item.name);
+        localStorage.setItem("item_quantity", selectQuantity.toString());
         localStorage.setItem(
-          "product_price",
+          "item_price",
           (item.price * selectQuantity).toString()
         );
       }

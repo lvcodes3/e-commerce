@@ -12,11 +12,11 @@ function App() {
   useEffect(() => {
     // existing cart in local storage //
     if (
-      localStorage.getItem("product_name") &&
-      localStorage.getItem("product_quantity") &&
-      localStorage.getItem("product_price")
+      localStorage.getItem("item_name") &&
+      localStorage.getItem("item_quantity") &&
+      localStorage.getItem("item_price")
     ) {
-      let storedQuantity = localStorage.getItem("product_quantity");
+      let storedQuantity = localStorage.getItem("item_quantity");
       if (storedQuantity !== null) {
         setCartQuantity(parseInt(storedQuantity));
       }
@@ -24,9 +24,9 @@ function App() {
     // no existing cart in local storage //
     else {
       // clear //
-      localStorage.removeItem("product_name");
-      localStorage.removeItem("product_quantity");
-      localStorage.removeItem("product_price");
+      localStorage.removeItem("item_name");
+      localStorage.removeItem("item_quantity");
+      localStorage.removeItem("item_price");
     }
   }, []);
 
