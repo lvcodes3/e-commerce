@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { RotatingLines } from "react-loader-spinner";
+import { useShoppingCart } from "../context/shoppingCartContext";
 
 interface Item {
   id: number;
@@ -13,15 +14,11 @@ interface Item {
   status: string;
 }
 
-type StoreProps = {
-  cartQuantity: number | null;
-  setCartQuantity: React.Dispatch<React.SetStateAction<number | null>>;
-};
-
-const Store: React.FC<StoreProps> = ({ cartQuantity, setCartQuantity }) => {
+const Store = () => {
+  const { getCartQuantity, increaseCartQuantity, decreaseCartQuantity } =
+    useShoppingCart();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [item, setItem] = useState<Item | null>(null);
-  const [selectQuantity, setSelectQuantity] = useState<number>(1);
 
   useEffect(() => {
     const getItem = async () => {
@@ -46,6 +43,8 @@ const Store: React.FC<StoreProps> = ({ cartQuantity, setCartQuantity }) => {
 
   const addToCart = () => {
     if (item) {
+      increaseCartQuantity(item.id);
+      /*
       // existing cart //
       if (
         localStorage.getItem("item_name") &&
@@ -78,6 +77,13 @@ const Store: React.FC<StoreProps> = ({ cartQuantity, setCartQuantity }) => {
           (item.price * selectQuantity).toString()
         );
       }
+      */
+    }
+  };
+
+  const removeFromCart = () => {
+    if (item) {
+      decreaseCartQuantity(item.id);
     }
   };
 
@@ -121,19 +127,18 @@ const Store: React.FC<StoreProps> = ({ cartQuantity, setCartQuantity }) => {
             )}
             <p className="text-lg font-medium">${item.price}</p>
             <div className="flex justify-center items-center gap-x-2">
-              <select
-                className="p-1"
-                onChange={(e) => setSelectQuantity(parseInt(e.target.value))}
+              <button
+                className="p-2 font-medium cursor-pointer rounded-full border-2 border-black"
+                onClick={removeFromCart}
               >
-                {[...Array(10)].map((_, index) => (
-                  <option key={index + 1}>{index + 1}</option>
-                ))}
-              </select>
+                -
+              </button>
+              <p>{getCartQuantity()}</p>
               <button
                 className="p-2 font-medium cursor-pointer rounded-full border-2 border-black"
                 onClick={addToCart}
               >
-                Add to Cart
+                +
               </button>
             </div>
           </div>
